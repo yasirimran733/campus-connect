@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Campus Connect - Smart Lost & Found System{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'university-blue': '#003366',
+                        'university-blue-light': '#0055AA',
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-university-blue text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo and Brand -->
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-3 hover:opacity-80 transition">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                        <span class="text-xl font-bold">Campus Connect</span>
+                    </a>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'home' %}" class="hover:text-gray-200 transition font-medium">Home</a>
+                    <a href="{% url 'items:list' %}" class="hover:text-gray-200 transition font-medium">Browse Items</a>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'users:dashboard' %}" class="hover:text-gray-200 transition font-medium">Dashboard</a>
+                        <a href="{% url 'chat:inbox' %}" class="hover:text-gray-200 transition font-medium">Messages</a>
+                        {% if user.is_verified %}
+                            <a href="{% url 'items:my_items' %}" class="hover:text-gray-200 transition font-medium">My Items</a>
+                        {% endif %}
+                        <a href="{% url 'users:profile' %}" class="hover:text-gray-200 transition font-medium">Profile</a>
+                        
+                        <!-- User Info Dropdown -->
+                        <div class="flex items-center space-x-3">
+                            <div class="text-right">
+                                <p class="text-sm font-medium">{{ user.get_full_name }}</p>
+                                {% if user.is_verified %}
+                                    <p class="text-xs text-green-300">✓ Verified</p>
+                                {% else %}
+                                    <p class="text-xs text-yellow-300">⏳ Pending Verification</p>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'users:logout' %}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-medium">
+                                Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="hover:text-gray-200 transition font-medium">Login</a>
+                        <a href="{% url 'users:register' %}" class="bg-white text-university-blue px-4 py-2 rounded-lg hover:bg-gray-100 transition font-medium">
+                            Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Messages/Alerts -->
+    {% if messages %}
+        <div class="container mx-auto px-4 mt-4">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}bg-red-100 border-red-500 text-red-700{% elif message.tags == 'warning' %}bg-yellow-100 border-yellow-500 text-yellow-700{% elif message.tags == 'success' %}bg-green-100 border-green-500 text-green-700{% else %}bg-blue-100 border-blue-500 text-blue-700{% endif %} border-l-4 p-4 rounded-lg shadow-md mb-4" role="alert">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            {% if message.tags == 'error' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            {% elif message.tags == 'warning' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            {% elif message.tags == 'success' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            {% else %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-university-blue text-white mt-auto">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p class="font-semibold">Campus Connect</p>
+                    <p class="text-sm text-gray-300">Smart Lost & Found System for Universities</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm">Developed by <span class="font-semibold">Yasir Imran</span></p>
+                    <p class="text-xs text-gray-300">Punjab University College of Information Technology (PUCIT)</p>
+                </div>
+            </div>
+            <div class="text-center mt-4 pt-4 border-t border-gray-600">
+                <p class="text-xs text-gray-400">&copy; 2025 Campus Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

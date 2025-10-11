@@ -1,0 +1,82 @@
+/* Custom CSS for Campus Connect */
+/* This file can be used for additional custom styles beyond Tailwind CSS */
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition-duration: 200ms;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #003366;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0055AA;
+}
+
+/* Form input focus animation */
+input:focus, textarea:focus, select:focus {
+    transform: scale(1.01);
+}
+
+/* Button hover effects */
+button:hover, a.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover effects */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Loading spinner (for future use) */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #003366;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Fade in animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Slide in animation */
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
