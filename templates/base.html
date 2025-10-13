@@ -34,6 +34,16 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        /* Mobile menu transition */
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -41,7 +51,7 @@
 <body class="bg-gray-50 min-h-screen flex flex-col">
     
     <!-- Navigation Bar -->
-    <nav class="bg-university-blue text-white shadow-lg">
+    <nav class="sticky top-0 shadow-md z-50 bg-university-blue text-white shadow-lg">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <!-- Logo and Brand -->
@@ -54,8 +64,18 @@
                     </a>
                 </div>
                 
-                <!-- Navigation Links -->
-                <div class="flex items-center space-x-6">
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="outline-none">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path id="close-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" class="hidden"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Navigation Links - Desktop -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="{% url 'home' %}" class="hover:text-gray-200 transition font-medium">Home</a>
                     <a href="{% url 'items:list' %}" class="hover:text-gray-200 transition font-medium">Browse Items</a>
                     
@@ -84,6 +104,45 @@
                     {% else %}
                         <a href="{% url 'users:login' %}" class="hover:text-gray-200 transition font-medium">Login</a>
                         <a href="{% url 'users:register' %}" class="bg-white text-university-blue px-4 py-2 rounded-lg hover:bg-gray-100 transition font-medium">
+                            Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu md:hidden pb-4">
+                <div class="flex flex-col space-y-3 pt-4">
+                    <a href="{% url 'home' %}" class="hover:text-gray-200 transition font-medium py-2">Home</a>
+                    <a href="{% url 'items:list' %}" class="hover:text-gray-200 transition font-medium py-2">Browse Items</a>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'users:dashboard' %}" class="hover:text-gray-200 transition font-medium py-2">Dashboard</a>
+                        <a href="{% url 'chat:inbox' %}" class="hover:text-gray-200 transition font-medium py-2">Messages</a>
+                        {% if user.is_verified %}
+                            <a href="{% url 'items:my_items' %}" class="hover:text-gray-200 transition font-medium py-2">My Items</a>
+                        {% endif %}
+                        <a href="{% url 'users:profile' %}" class="hover:text-gray-200 transition font-medium py-2">Profile</a>
+                        
+                        <!-- Mobile User Info -->
+                        <div class="pt-4 border-t border-gray-600">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">{{ user.get_full_name }}</p>
+                                    {% if user.is_verified %}
+                                        <p class="text-xs text-green-300">✓ Verified</p>
+                                    {% else %}
+                                        <p class="text-xs text-yellow-300">⏳ Pending Verification</p>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'users:logout' %}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-medium text-sm">
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="hover:text-gray-200 transition font-medium py-2">Login</a>
+                        <a href="{% url 'users:register' %}" class="bg-white text-university-blue px-4 py-2 rounded-lg hover:bg-gray-100 transition font-medium inline-block w-fit">
                             Register
                         </a>
                     {% endif %}
@@ -149,6 +208,29 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Mobile menu toggle script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('open');
+                
+                // Toggle icons
+                if (mobileMenu.classList.contains('open')) {
+                    menuIcon.classList.add('hidden');
+                    closeIcon.classList.remove('hidden');
+                } else {
+                    menuIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                }
+            });
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
