@@ -11,16 +11,16 @@
         </a>
     </div>
     
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+    <div class="grid md:grid-cols-3 gap-8">
         <!-- Main Content -->
-        <div class="lg:col-span-2">
+        <div class="md:col-span-2">
             <!-- Item Image -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                 {% if item.image %}
-                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-64 sm:h-80 md:h-96 object-cover">
+                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-full h-96 object-cover">
                 {% else %}
-                    <div class="w-full h-64 sm:h-80 md:h-96 bg-gray-200 flex items-center justify-center">
-                        <svg class="w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                        <svg class="w-32 h-32 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                         </svg>
                     </div>
@@ -28,19 +28,19 @@
             </div>
             
             <!-- Item Details -->
-            <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
                 <!-- Title and Type -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">{{ item.title }}</h1>
+                <div class="flex items-start justify-between mb-4">
+                    <h1 class="text-3xl font-bold text-gray-800">{{ item.title }}</h1>
                     {% if item.item_type == 'lost' %}
-                        <span class="bg-red-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-sm font-semibold">Lost Item</span>
+                        <span class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold">Lost Item</span>
                     {% else %}
-                        <span class="bg-green-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-sm font-semibold">Found Item</span>
+                        <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold">Found Item</span>
                     {% endif %}
                 </div>
                 
                 <!-- Category and Status -->
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex space-x-3 mb-6">
                     <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                         {{ item.get_category_display }}
                     </span>
@@ -61,7 +61,7 @@
                 </div>
                 
                 <!-- Location and Date -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-university-blue" fill="currentColor" viewBox="0 0 20 20">
@@ -99,9 +99,9 @@
         </div>
         
         <!-- Sidebar -->
-        <div class="lg:col-span-1">
+        <div class="md:col-span-1">
             <!-- Contact Information -->
-            <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h2>
                 
                 {% if can_see_contact %}
@@ -134,11 +134,11 @@
                     
                     <!-- Contact Button -->
                     <div class="space-y-3">
-                        <a href="mailto:{{ item.contact_email|default:item.user.email }}" class="block w-full bg-university-blue text-white text-center py-3 rounded-lg hover:bg-university-blue-light transition font-medium text-sm md:text-base">
+                        <a href="mailto:{{ item.contact_email|default:item.user.email }}" class="block w-full bg-university-blue text-white text-center py-3 rounded-lg hover:bg-university-blue-light transition font-medium">
                             Contact Owner (Email)
                         </a>
                         {% if user.is_authenticated and user.is_verified and user != item.user %}
-                            <a href="{% url 'chat:start_from_item' item.id %}" class="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition font-medium text-sm md:text-base">
+                            <a href="{% url 'chat:start_from_item' item.id %}" class="block w-full bg-green-600 text-white text-center py-3 rounded-lg hover:bg-green-700 transition font-medium">
                                 Message Owner (Chat)
                             </a>
                         {% endif %}
@@ -154,7 +154,7 @@
                             {% endif %}
                         </p>
                         {% if not user.is_authenticated %}
-                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="block w-full bg-university-blue text-white text-center py-2 rounded-lg hover:bg-university-blue-light transition font-medium text-sm">
+                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="block w-full bg-university-blue text-white text-center py-2 rounded-lg hover:bg-university-blue-light transition font-medium">
                                 Login
                             </a>
                         {% endif %}
@@ -164,16 +164,16 @@
             
             <!-- Edit/Delete (if owner) -->
             {% if user == item.user %}
-                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">Manage Item</h3>
                     <div class="space-y-3">
-                        <a href="{% url 'items:edit' item.pk %}" class="block w-full bg-blue-500 text-white text-center py-2 rounded-lg hover:bg-blue-600 transition font-medium text-sm">
+                        <a href="{% url 'items:edit' item.pk %}" class="block w-full bg-blue-500 text-white text-center py-2 rounded-lg hover:bg-blue-600 transition font-medium">
                             Edit Item
                         </a>
-                        <a href="{% url 'items:update_status' item.pk %}" class="block w-full bg-green-500 text-white text-center py-2 rounded-lg hover:bg-green-600 transition font-medium text-sm">
+                        <a href="{% url 'items:update_status' item.pk %}" class="block w-full bg-green-500 text-white text-center py-2 rounded-lg hover:bg-green-600 transition font-medium">
                             Update Status
                         </a>
-                        <a href="{% url 'items:delete' item.pk %}" class="block w-full bg-red-500 text-white text-center py-2 rounded-lg hover:bg-red-600 transition font-medium text-sm">
+                        <a href="{% url 'items:delete' item.pk %}" class="block w-full bg-red-500 text-white text-center py-2 rounded-lg hover:bg-red-600 transition font-medium">
                             Delete Item
                         </a>
                     </div>
@@ -181,7 +181,7 @@
             {% endif %}
             
             <!-- Share -->
-            <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div class="bg-white rounded-xl shadow-lg p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">Share This Item</h3>
                 <p class="text-sm text-gray-600 mb-3">Help spread the word!</p>
                 <div class="flex space-x-2">
@@ -197,7 +197,7 @@
     {% if related_items %}
         <div class="mt-12">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Items</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="grid md:grid-cols-4 gap-6">
                 {% for related in related_items %}
                     <a href="{% url 'items:detail' related.pk %}" class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
                         <div class="h-32 bg-gray-200">
