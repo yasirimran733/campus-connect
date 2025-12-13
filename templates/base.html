@@ -159,44 +159,44 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden pb-4">
-          <div class="flex flex-col space-y-3">
+        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-blue-400 mt-2 pt-2">
+          <div class="flex flex-col space-y-1">
             <a
               href="{% url 'home' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >Home</a
             >
             <a
               href="{% url 'items:list' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >Browse Items</a
             >
 
             {% if user.is_authenticated %}
             <a
               href="{% url 'users:dashboard' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >Dashboard</a
             >
             <a
               href="{% url 'chat:inbox' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >Messages</a
             >
             {% if user.is_verified %}
             <a
               href="{% url 'items:my_items' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >My Items</a
             >
             {% endif %}
             <a
               href="{% url 'users:profile' %}"
-              class="hover:text-gray-200 transition font-medium py-2"
+              class="block hover:text-gray-200 hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
               >Profile</a
             >
 
-            <div class="border-t border-blue-400 pt-3 mt-2">
+            <div class="border-t border-blue-400 pt-3 mt-2 px-3">
               <div class="flex items-center justify-between mb-3">
                 <div>
                   <p class="text-sm font-medium">{{ user.get_full_name }}</p>
@@ -215,9 +215,22 @@
               </a>
             </div>
             {% else %}
-            <div class="flex flex-col space-y-2 mt-2">
+            <div class="flex flex-col space-y-2 mt-2 px-3">
               <a
                 href="{% url 'users:login' %}"
+                class="block text-center hover:bg-blue-800 rounded px-3 py-2 transition font-medium"
+                >Login</a
+              >
+              <a
+                href="{% url 'users:register' %}"
+                class="block text-center bg-white text-university-blue px-4 py-2 rounded-lg hover:bg-gray-100 transition font-medium"
+              >
+                Register
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
                 class="hover:text-gray-200 transition font-medium py-2"
                 >Login</a
               >
