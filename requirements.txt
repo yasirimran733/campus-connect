@@ -1,5 +1,6 @@
 # Core Django Framework
 Django>=5.0,<6.0
+django-jazzmin>=2.6.0
 
 # Database adapter for PostgreSQL (optional, can use SQLite for development)
 psycopg2-binary>=2.9.9
