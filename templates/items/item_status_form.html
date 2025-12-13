@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Status - {{ item.title }} - Campus Connect{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-university-blue w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-university-blue">Update Item Status</h2>
+            <p class="text-gray-600 mt-2">{{ item.title }}</p>
+        </div>
+        
+        <!-- Current Status -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p class="text-sm text-blue-800">
+                <strong>Current Status:</strong> {{ item.get_status_display }}
+            </p>
+        </div>
+        
+        <!-- Status Options Info -->
+        <div class="mb-6 space-y-3">
+            <div class="flex items-start">
+                <div class="bg-green-100 p-2 rounded-lg mr-3">
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-800">Active</p>
+                    <p class="text-sm text-gray-600">Item is still lost/found and visible to others</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="bg-yellow-100 p-2 rounded-lg mr-3">
+                    <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-800">Claimed</p>
+                    <p class="text-sm text-gray-600">Someone has claimed this item</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-800">Returned</p>
+                    <p class="text-sm text-gray-600">Item has been returned to owner</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <div class="bg-gray-100 p-2 rounded-lg mr-3">
+                    <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-800">Closed</p>
+                    <p class="text-sm text-gray-600">Item listing is closed (hidden from public)</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Select New Status
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.status.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="flex space-x-4">
+                <button type="submit" class="flex-1 bg-university-blue text-white py-3 rounded-lg hover:bg-university-blue-light transition font-semibold">
+                    Update Status
+                </button>
+                <a href="{% url 'items:my_items' %}" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition font-semibold text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

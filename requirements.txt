@@ -1,0 +1,23 @@
+# Core Django Framework
+Django>=5.0,<6.0
+
+# Database adapter for PostgreSQL (optional, can use SQLite for development)
+psycopg2-binary>=2.9.9
+
+# Environment variables management
+python-decouple>=3.8
+
+# Image handling
+Pillow>=10.0.0
+
+# Django Channels for WebSockets (for future chat feature)
+channels>=4.0.0
+channels-redis>=4.1.0
+daphne>=4.0.0
+
+# For production deployment
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+
+# Development tools
+django-debug-toolbar>=4.2.0

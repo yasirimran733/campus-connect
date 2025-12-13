@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Campus Connect{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-university-blue">Dashboard</h1>
+        <p class="text-gray-600 mt-2">Welcome back, {{ user.get_full_name }}!</p>
+    </div>
+    
+    <!-- Verification Alert for Unverified Users -->
+    {% if not user.is_verified %}
+    <div class="mb-8 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg shadow-md">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-yellow-600 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-lg font-semibold text-yellow-800">Account Pending Verification</h3>
+                <p class="text-yellow-700 mt-1">Your account is awaiting admin approval. Some features are currently limited. You'll be notified once your account is verified.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <!-- Card 1: Items Posted -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <svg class="w-6 h-6 text-university-blue" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">{{ items_stats.total|default:0 }}</h3>
+            <p class="text-gray-600 text-sm">Items Posted</p>
+        </div>
+        
+        <!-- Card 2: Pending Approval -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-yellow-100 p-3 rounded-lg">
+                    <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">{{ items_stats.pending|default:0 }}</h3>
+            <p class="text-gray-600 text-sm">Pending Approval</p>
+        </div>
+        
+        <!-- Card 3: Active Items -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">{{ items_stats.approved|default:0 }}</h3>
+            <p class="text-gray-600 text-sm">Active Items</p>
+        </div>
+        
+        <!-- Card 4: Account Status -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div class="{% if user.is_verified %}bg-green-100{% else %}bg-yellow-100{% endif %} p-3 rounded-lg">
+                    <svg class="w-6 h-6 {% if user.is_verified %}text-green-600{% else %}text-yellow-600{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">{% if user.is_verified %}Verified{% else %}Pending{% endif %}</h3>
+            <p class="text-gray-600 text-sm">Account Status</p>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="grid md:grid-cols-3 gap-6">
+        <!-- Recent Items -->
+        <div class="md:col-span-2 bg-white rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-university-blue">Recent Items</h2>
+                <a href="{% url 'items:list' %}" class="text-university-blue hover:text-university-blue-light text-sm font-medium">
+                    View All →
+                </a>
+            </div>
+            
+            {% if recent_items %}
+                <div class="space-y-4">
+                    {% for item in recent_items %}
+                        <a href="{% url 'items:detail' item.pk %}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-16 h-16 rounded-lg object-cover mr-4">
+                            {% else %}
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg mr-4 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">{{ item.title }}</h3>
+                                <p class="text-sm text-gray-600">{{ item.location }} • {{ item.date_lost_found|date:"M d" }}</p>
+                            </div>
+                            {% if item.item_type == 'lost' %}
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold">Lost</span>
+                            {% else %}
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Found</span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No Items Yet</h3>
+                    <p class="text-gray-500 text-sm mb-6">Be the first to post a lost or found item!</p>
+                    {% if user.is_verified %}
+                        <a href="{% url 'items:create' %}" class="inline-block bg-university-blue text-white px-6 py-2 rounded-lg hover:bg-university-blue-light transition font-medium">
+                            Post an Item
+                        </a>
+                    {% else %}
+                        <p class="text-yellow-600 text-sm">Available after account verification</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-university-blue mb-6">Quick Actions</h2>
+            
+            <div class="space-y-4">
+                {% if user.is_verified %}
+                    <a href="{% url 'items:create' %}" class="w-full bg-university-blue text-white py-3 rounded-lg hover:bg-university-blue-light transition font-medium flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Post New Item
+                    </a>
+                    
+                    <a href="{% url 'items:my_items' %}" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                        My Items
+                    </a>
+                    
+                    <a href="{% url 'items:list' %}" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-medium flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                        </svg>
+                        Browse Items
+                    </a>
+                {% else %}
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                        <svg class="w-8 h-8 text-yellow-600 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-yellow-800 font-medium">Actions Locked</p>
+                        <p class="text-xs text-yellow-700 mt-1">Available after verification</p>
+                    </div>
+                {% endif %}
+                
+                <a href="{% url 'users:profile' %}" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition font-medium flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                    </svg>
+                    View Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

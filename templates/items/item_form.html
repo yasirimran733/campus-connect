@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Campus Connect{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'items:my_items' %}" class="text-university-blue hover:text-university-blue-light font-medium">
+            ← Back to My Items
+        </a>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-university-blue w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-university-blue">{{ title }}</h2>
+            <p class="text-gray-600 mt-2">
+                {% if is_edit %}
+                    Update your item information
+                {% else %}
+                    Report a lost or found item
+                {% endif %}
+            </p>
+        </div>
+        
+        <!-- Important Notice -->
+        {% if not is_edit %}
+            <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-blue-800 font-medium">Admin Approval Required</p>
+                        <p class="text-xs text-blue-700 mt-1">Your item will be reviewed by an admin before being publicly visible. This helps maintain quality and prevent spam.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Non-field Errors -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Item Type -->
+            <div>
+                <label for="{{ form.item_type.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.item_type.label }} *
+                </label>
+                {{ form.item_type }}
+                {% if form.item_type.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.item_type.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Title -->
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.title.label }} *
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.title.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.title.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Category -->
+            <div>
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.category.label }} *
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.category.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.description.label }} *
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.description.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.description.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Image Upload -->
+            <div>
+                <label for="{{ form.image.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    {{ form.image.label }}
+                </label>
+                {% if is_edit and item.image %}
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Current image:</p>
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="w-32 h-32 object-cover rounded-lg border border-gray-300">
+                    </div>
+                {% endif %}
+                {{ form.image }}
+                {% if form.image.errors %}
+                    <div class="mt-2 text-sm text-red-600">
+                        {% for error in form.image.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.image.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Location and Date (Side by Side) -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- Location -->
+                <div>
+                    <label for="{{ form.location.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.location.label }} *
+                    </label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        <div class="mt-2 text-sm text-red-600">
+                            {% for error in form.location.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.location.help_text }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Date -->
+                <div>
+                    <label for="{{ form.date_lost_found.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.date_lost_found.label }} *
+                    </label>
+                    {{ form.date_lost_found }}
+                    {% if form.date_lost_found.errors %}
+                        <div class="mt-2 text-sm text-red-600">
+                            {% for error in form.date_lost_found.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.date_lost_found.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Information (Optional)</h3>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Contact Phone -->
+                    <div>
+                        <label for="{{ form.contact_phone.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.contact_phone.label }}
+                        </label>
+                        {{ form.contact_phone }}
+                        {% if form.contact_phone.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.contact_phone.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="mt-1 text-xs text-gray-500">{{ form.contact_phone.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Contact Email -->
+                    <div>
+                        <label for="{{ form.contact_email.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            {{ form.contact_email.label }}
+                        </label>
+                        {{ form.contact_email }}
+                        {% if form.contact_email.errors %}
+                            <div class="mt-2 text-sm text-red-600">
+                                {% for error in form.contact_email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="mt-1 text-xs text-gray-500">{{ form.contact_email.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reward Information -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Reward Information (Optional)</h3>
+                
+                <div class="flex items-center mb-4">
+                    {{ form.reward_offered }}
+                    <label for="{{ form.reward_offered.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                        {{ form.reward_offered.label }}
+                    </label>
+                </div>
+                
+                <div>
+                    <label for="{{ form.reward_amount.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                        {{ form.reward_amount.label }}
+                    </label>
+                    {{ form.reward_amount }}
+                    {% if form.reward_amount.errors %}
+                        <div class="mt-2 text-sm text-red-600">
+                            {% for error in form.reward_amount.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.reward_amount.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Submit Buttons -->
+            <div class="flex space-x-4 pt-6">
+                <button type="submit" class="flex-1 bg-university-blue text-white py-3 rounded-lg hover:bg-university-blue-light transition font-semibold">
+                    {% if is_edit %}
+                        Update Item
+                    {% else %}
+                        Post Item
+                    {% endif %}
+                </button>
+                <a href="{% url 'items:my_items' %}" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition font-semibold text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
