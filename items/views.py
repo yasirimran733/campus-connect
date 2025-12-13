@@ -273,12 +273,35 @@ def lost_items(request):
     """
     View specifically for lost items.
     """
+    # Get search form to maintain consistency with list view
+    search_form = ItemSearchForm(request.GET)
+    
     items = Item.objects.filter(
         is_approved=True,
         item_type='lost',
         status='active'
     ).select_related('user')
     
+    # Apply search filters if needed
+    if search_form.is_valid():
+        search_query = search_form.cleaned_data.get('search')
+        category = search_form.cleaned_data.get('category')
+        date_from = search_form.cleaned_data.get('date_from')
+        date_to = search_form.cleaned_data.get('date_to')
+        
+        if search_query:
+            items = items.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(location__icontains=search_query)
+            )
+        if category:
+            items = items.filter(category=category)
+        if date_from:
+            items = items.filter(date_lost_found__gte=date_from)
+        if date_to:
+            items = items.filter(date_lost_found__lte=date_to)
+
     # Pagination
     paginator = Paginator(items, 12)
     page_number = request.GET.get('page')
@@ -286,6 +309,7 @@ def lost_items(request):
     
     context = {
         'page_obj': page_obj,
+        'search_form': search_form,
         'item_type': 'lost',
         'title': 'Lost Items'
     }
@@ -296,12 +320,35 @@ def found_items(request):
     """
     View specifically for found items.
     """
+    # Get search form to maintain consistency with list view
+    search_form = ItemSearchForm(request.GET)
+
     items = Item.objects.filter(
         is_approved=True,
         item_type='found',
         status='active'
     ).select_related('user')
     
+    # Apply search filters if needed
+    if search_form.is_valid():
+        search_query = search_form.cleaned_data.get('search')
+        category = search_form.cleaned_data.get('category')
+        date_from = search_form.cleaned_data.get('date_from')
+        date_to = search_form.cleaned_data.get('date_to')
+        
+        if search_query:
+            items = items.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(location__icontains=search_query)
+            )
+        if category:
+            items = items.filter(category=category)
+        if date_from:
+            items = items.filter(date_lost_found__gte=date_from)
+        if date_to:
+            items = items.filter(date_lost_found__lte=date_to)
+
     # Pagination
     paginator = Paginator(items, 12)
     page_number = request.GET.get('page')
@@ -309,6 +356,7 @@ def found_items(request):
     
     context = {
         'page_obj': page_obj,
+        'search_form': search_form,
         'item_type': 'found',
         'title': 'Found Items'
     }

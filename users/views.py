@@ -154,6 +154,7 @@ def profile_view(request):
     return render(request, 'users/profile.html', context)
 
 
+@login_required
 def dashboard_view(request):
     """
     Main dashboard view with items statistics.
