@@ -1,51 +1,79 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 from .forms import UserRegistrationForm, UserLoginForm
 from .models import User
 
 
 def register_view(request):
     """
-    User registration view.
+    User registration view with email verification.
     
     Features:
-    - Anyone can register (no restrictions)
-    - New users are created with is_verified=False
-    - After registration, users are redirected to login page
-    - Success message informs users about pending admin approval
-    
-    Template: users/register.html
+    - Only @pucit.edu.pk emails allowed (handled by form)
+    - New users are created with is_verified=False and is_active=False
+    - Sends verification email with token
     """
     if request.user.is_authenticated:
-        # If user is already logged in, redirect to home
         return redirect('home')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            # Save the user (is_verified will be False by default)
-            user = form.save()
+            user = form.save(commit=False)
+            user.is_active = False  # Prevent login until verified
+            user.is_verified = False
+            user.save()
             
-            # Show success message
-            messages.success(
-                request,
-                f'Account created successfully for {user.username}! '
-                'Your account is pending admin approval. You can login, but some features '
-                'will be limited until your account is verified.'
-            )
+            # Generate verification token
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your Campus Connect account'
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
             
-            # Redirect to login page
+            # Construct activation link
+            activation_link = f"http://{current_site.domain}/users/activate/{uid}/{token}/"
+            
+            message = f"""
+            Hi {user.first_name},
+            
+            Please click on the link below to verify your email and activate your account:
+            {activation_link}
+            
+            If you did not register for this account, please ignore this email.
+            """
+            
+            try:
+                send_mail(
+                    mail_subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [user.email],
+                    fail_silently=False,
+                )
+                messages.success(
+                    request,
+                    f'Account created! A verification email has been sent to {user.email}. '
+                    'Please check your inbox to activate your account.'
+                )
+            except Exception as e:
+                messages.error(request, f'Error sending email: {str(e)}')
+                user.delete() # Delete user if email fails
+                return redirect('users:register')
+            
             return redirect('users:login')
         else:
-            # Show error message if form is invalid
-            messages.error(
-                request,
-                'Please correct the errors below.'
-            )
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = UserRegistrationForm()
     
@@ -56,20 +84,32 @@ def register_view(request):
     return render(request, 'users/register.html', context)
 
 
+def activate_account(request, uidb64, token):
+    """
+    Activate user account via email token.
+    """
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.is_verified = True
+        user.save()
+        messages.success(request, 'Your account has been verified successfully! You can now login.')
+        return redirect('users:login')
+    else:
+        messages.error(request, 'Activation link is invalid or has expired!')
+        return redirect('users:login')
+
+
 def login_view(request):
     """
     User login view.
-    
-    Features:
-    - Users can login with username and password
-    - After login, check if user is verified
-    - Show appropriate message based on verification status
-    - Redirect to home page after successful login
-    
-    Template: users/login.html
     """
     if request.user.is_authenticated:
-        # If user is already logged in, redirect to home
         return redirect('home')
     
     if request.method == 'POST':
@@ -78,35 +118,25 @@ def login_view(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             
-            # Authenticate user
             user = authenticate(username=username, password=password)
             
             if user is not None:
-                # Log the user in
                 login(request, user)
-                
-                # Check verification status and show appropriate message
-                if user.is_verified:
-                    messages.success(
-                        request,
-                        f'Welcome back, {user.get_full_name()}!'
-                    )
-                else:
-                    messages.warning(
-                        request,
-                        f'Welcome, {user.get_full_name()}! Your account is pending admin approval. '
-                        'Some features may be limited until your account is verified.'
-                    )
-                
-                # Redirect to next page or home
+                messages.success(request, f'Welcome back, {user.get_full_name()}!')
                 next_page = request.GET.get('next', 'home')
                 return redirect(next_page)
+            else:
+                # Check if user exists but is inactive
+                try:
+                    user_obj = User.objects.get(username=username)
+                    if not user_obj.is_active:
+                        messages.error(request, 'Your account is not active. Please check your email for the verification link.')
+                    else:
+                        messages.error(request, 'Invalid username or password.')
+                except User.DoesNotExist:
+                    messages.error(request, 'Invalid username or password.')
         else:
-            # Show error message
-            messages.error(
-                request,
-                'Invalid username or password. Please try again.'
-            )
+            messages.error(request, 'Invalid username or password.')
     else:
         form = UserLoginForm()
     

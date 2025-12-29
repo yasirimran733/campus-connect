@@ -25,6 +25,12 @@ class UserRegistrationForm(UserCreationForm):
         }),
         help_text='Only PUCIT email addresses (@pucit.edu.pk) are allowed.'
     )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and not email.endswith(self.ALLOWED_EMAIL_DOMAIN):
+            raise forms.ValidationError(f"Please use your university email ending with {self.ALLOWED_EMAIL_DOMAIN}")
+        return email
     
     first_name = forms.CharField(
         max_length=150,
