@@ -102,7 +102,7 @@ class Item(models.Model):
     )
     
     is_approved = models.BooleanField(
-        default=False,
+        default=True,
         help_text="Admin must approve before item is publicly visible"
     )
     

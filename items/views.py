@@ -125,13 +125,13 @@ def item_create(request):
         if form.is_valid():
             item = form.save(commit=False)
             item.user = request.user
-            item.is_approved = False  # Requires admin approval
+            item.is_approved = False  # Pending approval
             item.save()
             
             messages.success(
                 request,
                 f'Your item "{item.title}" has been posted successfully! '
-                'It will be visible after admin approval.'
+                'It is pending admin approval before it becomes visible to everyone.'
             )
             return redirect('items:my_items')
         else:
@@ -252,11 +252,20 @@ def item_update_status(request, pk):
     if request.method == 'POST':
         form = ItemStatusForm(request.POST, instance=item)
         if form.is_valid():
-            form.save()
-            messages.success(
-                request,
-                f'Status updated to "{item.get_status_display()}"'
-            )
+            new_status = form.cleaned_data.get('status')
+            if new_status == 'claimed':
+                item_title = item.title
+                item.delete()
+                messages.success(
+                    request,
+                    f'Item "{item_title}" has been marked as claimed and removed from the database.'
+                )
+            else:
+                form.save()
+                messages.success(
+                    request,
+                    f'Status updated to "{item.get_status_display()}"'
+                )
             return redirect('items:my_items')
     else:
         form = ItemStatusForm(instance=item)
